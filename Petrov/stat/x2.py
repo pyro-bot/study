@@ -1,25 +1,42 @@
-class Pirson(object):
-    
-    def __init__(self, x, y, r=False, interval=None, c=None, low=6, disable_check_len_interval=False):
+import pirson
+from functools import partial
+from collections import Counter, defaultdict, namedtuple
+import random
+
+class X2Discrete (pirson.Pirson):
+    def __init__(self, x, y):
         self.rnd = random.Random()
-        if not r:
-            self.count = Counter(x)
-        elif isinstance(interval, list):
-            self.count = Pirson.transform_range_to_array(x, set_range=interval, disable_check_len_interval=disable_check_len_interval)
+        self.count = Counter(x)
+        self.l = len(x)
+        self.y = y
+
+    def get_stat(self):
+        n = self.count
+        l = self.l
+        p = self.y
+       
+        X = sum(((n[i] - l*pi)**2) / (l * pi) for i, pi in p.items())
+        
+        return X
+
+class X2Float(pirson.Pirson):
+    def __init__(self, x, y, interval=None, c=None, low=6, disable_check_len_interval=False):
+        if isinstance(interval, list):
+            self.count = X2Float.transform_range_to_array(x, set_range=interval, disable_check_len_interval=disable_check_len_interval)
         else:
             z = x if len(x)<=len(y) else y
-            self.range = Pirson.find_optimal_interval(z, c or len(z)//2, low)
+            self.range = X2Float.find_optimal_interval(z, c or len(z)//2, low)
             self.count = self.range.y
         if isinstance(y, dict):
             self.y = y
             self.l = len(x)
         else:
             self.l = len(y)
-            self.y = Pirson.get_squense_from_array(y, interval=self.range)
+            self.y = X2Float.get_squense_from_array(y, interval=self.range)
 
     @staticmethod
     def find_optimal_interval(x, start_count=20, low=5):
-        get_interval = partial(Pirson.transform_range_to_array, x=x, disable_check_len_interval=True, get_interval=True)
+        get_interval = partial(X2Float.transform_range_to_array, x=x, disable_check_len_interval=True, get_interval=True)
         start_r = get_interval(c=start_count)
         r = start_r
         while list(filter(lambda item: item[1] < low, r.y.items())):
@@ -40,7 +57,7 @@ class Pirson(object):
     @staticmethod
     def get_squense_from_array(y, interval=None):
         if not interval:
-            r = Pirson.find_optimal_interval(y,start_count=len(y)//2).y
+            r = X2Float.find_optimal_interval(y,start_count=len(y)//2).y
         else:
             r = interval.y.copy()
         sequnse = r
@@ -79,12 +96,11 @@ class Pirson(object):
         else:
             return namedtuple('TransformRangeToArray', ['y', 'range'])(y=y, range=r)
 
-
     def get_stat(self):
-        n = self.count
-        l = self.l
-        p = self.y
-       
-        X = sum(((n[i] - l*pi)**2) / (l * pi) for i, pi in p.items())
-        
-        return X
+    n = self.count
+    l = self.l
+    p = self.y
+    
+    X = sum(((n[i] - l*pi)**2) / (l * pi) for i, pi in p.items())
+    
+    return X
