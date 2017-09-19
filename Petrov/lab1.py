@@ -9,7 +9,8 @@ import scipy.optimize as opt
 import numpy as np
 from matplotlib import pyplot as plt
 
-from pirson import Pirson
+from stat.x2 import X2Discrete
+from stat.exp_range import ExpRange
 
     
 
@@ -50,7 +51,7 @@ def main():
             3,9,12,9,5,5,3,9,5,9,9,7,3,2,7,3,3,9,7,5
         ]
     y = {2:0.1, 3:0.2, 5:0.15, 7:0.05, 9:0.3, 12:0.2}
-    print(Pirson(x,y).get_stat())
+    print(X2Discrete(x,y).get_stat())
 
 
 if __name__ == '__main__':
@@ -61,7 +62,7 @@ if __name__ == '__main__':
     # e = exp_range(0.01,(rnd.random()for _ in count()))
     x = np.array([rnd.random() for _ in range(100)])
     y = np.fromiter(map(lambda i: exp_f(i,1.5), x ), dtype=np.float)
-    P = Pirson(_x,y, r=True)
+    P = ExpRange(_x,y)
     z = P.get_stat()
     print(z, P.range)
 

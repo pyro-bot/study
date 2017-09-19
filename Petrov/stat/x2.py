@@ -1,4 +1,4 @@
-import pirson
+from stat import pirson
 from functools import partial
 from collections import Counter, defaultdict, namedtuple
 import random
@@ -97,10 +97,10 @@ class X2Float(pirson.Pirson):
             return namedtuple('TransformRangeToArray', ['y', 'range'])(y=y, range=r)
 
     def get_stat(self):
-    n = self.count
-    l = self.l
-    p = self.y
-    
-    X = sum(((n[i] - l*pi)**2) / (l * pi) for i, pi in p.items())
-    
-    return X
+        n = self.count
+        l = self.l
+        p = self.y
+        
+        X = sum(((n[i] - l*pi)**2) / (l * pi) for i, pi in p.items())
+        
+        return X
