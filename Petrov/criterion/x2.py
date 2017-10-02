@@ -1,4 +1,4 @@
-from stat import pirson
+from criterion import pirson
 from functools import partial
 from collections import Counter, defaultdict, namedtuple
 import random

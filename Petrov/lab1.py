@@ -9,8 +9,8 @@ import scipy.optimize as opt
 import numpy as np
 from matplotlib import pyplot as plt
 
-from stat.x2 import X2Discrete
-from stat.exp_range import ExpRange
+from criterion.x2 import X2Discrete
+from criterion.exp_range import ExpRange
 
     
 
@@ -58,24 +58,10 @@ if __name__ == '__main__':
     # main()
     rnd = random.Random()
     _x = read_file()
-    _r = Pirson.find_optimal_interval(_x, start_count=len(_x)//2)
+    _r = ExpRange.find_optimal_interval(_x, start_count=len(_x))
     # e = exp_range(0.01,(rnd.random()for _ in count()))
     x = np.array([rnd.random() for _ in range(100)])
     y = np.fromiter(map(lambda i: exp_f(i,1.5), x ), dtype=np.float)
-    P = ExpRange(_x,y)
+    P = ExpRange(_x, y, 1.5)
     z = P.get_stat()
     print(z, P.range)
-
-    # print(Pirson.get_squense_from_array(y))
-    # def f_opt(z):
-    #     r = Pirson.get_squense_from_array(np.fromiter(map(lambda i: exp_f(i,z), x ), dtype=np.float), interval=_r.range)
-    #     p = Pirson(x, r.y, r=True, interval=r.range, disable_check_len_interval=True).get_stat()
-    #     return p
-    # o = opt.minimize_scalar(f_opt,bounds=(0.1,10), method='bounded')
-    # print(o)
-
-    # plt.plot(x,y,'o')
-    # plt.show()
-    # for _ in range(100):
-    #     print(next(e))
-        
