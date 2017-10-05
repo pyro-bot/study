@@ -61,7 +61,7 @@ if __name__ == '__main__':
     _r = ExpRange.find_optimal_interval(_x, start_count=len(_x))
     # e = exp_range(0.01,(rnd.random()for _ in count()))
     x = np.array([rnd.random() for _ in range(100)])
-    y = np.fromiter(map(lambda i: exp_f(i,1.5), x ), dtype=np.float)
+    y = np.fromiter(map(lambda i: exp_f(i,1.5), _x ), dtype=np.float)
     P = ExpRange(_x, y, 1.5)
     z = P.get_stat()
     print(z, P.range)
