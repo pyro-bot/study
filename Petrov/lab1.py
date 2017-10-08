@@ -11,8 +11,33 @@ from matplotlib import pyplot as plt
 
 from criterion.x2 import X2Discrete
 from criterion.exp_range import ExpRange
-
+from optimize.evolution import EvolutionOptimize
     
+
+class FindOptimizeInterval(EvolutionOptimize):
+
+    def __init__(self, a, x, y):
+        self.max = max(x)
+        self.a = a
+        self.y = y
+        super().__init__()
+
+    def megre_gen(self, a, b, i):
+        if i==0:
+            return self.rand.randint(100)
+        else:
+            return (a + b) / 2
+
+    def min_f(self, arr):
+        P = ExpRange(_x, y, 1.5, list(arr))
+        z = P.get_stat()
+        return z
+
+    def create_DNA(self):
+        n = self.rand.randint(100)
+        buf=[0, self.max]
+        for i in range(n-2):
+
 
 def exp_range(a, x_gen):
     while True:
@@ -62,6 +87,6 @@ if __name__ == '__main__':
     # e = exp_range(0.01,(rnd.random()for _ in count()))
     x = np.array([rnd.random() for _ in range(100)])
     y = np.fromiter(map(lambda i: exp_f(i,1.5), _x ), dtype=np.float)
-    P = ExpRange(_x, y, 1.5)
+    P = ExpRange(_x, y, 1.5, [0, 0.3, 0.6, 0.9, 1.2, 1.8, 5.7])
     z = P.get_stat()
     print(z, P.range)
