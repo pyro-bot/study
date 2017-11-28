@@ -13,8 +13,8 @@ from criterion.x2 import X2Discrete
 from criterion.exp_range import ExpRange
 from optimize.evolution import EvolutionOptimize
 from criterion.test_h import test as test_h
-
-
+from math import factorial, exp
+from itertools import groupby
 rnd = random.Random()
 rand = rnd.random
 
@@ -24,7 +24,7 @@ alpha = 0.05
 print(alpha)
 
 print('Задача 1. Моделирование дискретной случайной величины с конечным числом значений')
-print('Случай1. Дан ряд распределения')
+print('Случай 1. Дан ряд распределения')
 
 # Количество реализаций
 print('Количество реализаций n:')
@@ -89,11 +89,11 @@ print('Проверка гипотезы H0:', test_h(task_1, alpha, k1 - 1))
 
 print('------------------------------------------------------------------------------------------------------------------------------')
 
-print('Случай2. Дана функция распределения')
+print('Случай 2. Дана функция распределения')
 
 # Количество реализаций
 print('Количество реализаций n:')
-n2 = 100
+n2 = 1000
 print(n2)
 
 
@@ -109,9 +109,10 @@ print(P2)
 
 # Массив псевдослучайных чисел
 print('Массив псевдослучайных чисел альфа:')
-genalpha2 = np.random.uniform(size=100)
+genalpha2 = np.random.uniform(size=n2)
 print(genalpha2)
-
+plt.hist(genalpha2)
+plt.show()
 # количество частей отрезка (01)
 print('Количество частей k:')
 k2 = 5
@@ -119,36 +120,41 @@ print(k2)
 
 # Точки для разбития отрезка (01)
 U2=[0]
-for kcount in range(k2):
+for kcount in range(k2 - 1):
     U2.append(P2[kcount] + U2[kcount])
 
-print('U2:')
-print(U2)
+print('U2:', U2)
+print(sum(U2))
 
 # Получим n-реализаций случайной величины кси с помощью моделирующей формулы
 # Массив n-реализаций случайной величины кси A
 print('Массив n-реализаций случайной величины кси A:')
 A2 = []
-for ncount in range(1,n1):
-    if(genalpha2[ncount] <= U2[2]):
-        A2.append(ksi2[0])
-    elif (genalpha2[ncount] > U2[2] and genalpha2[ncount] <= U2[3]):
-        A2.append(ksi2[1])
-    elif (genalpha2[ncount] > U2[3] and genalpha2[ncount] <= U2[4]):
-        A2.append(ksi2[2])
-    elif (genalpha2[ncount] > U2[4] and genalpha2[ncount] <= U2[5]):
-        A2.append(ksi2[3])  
-    elif (genalpha2[ncount] > U2[5] and genalpha2[ncount] <= U2[6]):
-        A2.append(ksi2[4])
+U2ksi2 = dict([(U2[i], ksi2[i]) for i in range(len(U2))])
+print(U2ksi2)
+for num in genalpha2:
+    mx = max(filter(lambda a:num >= a, U2))
+    A2.append(U2ksi2[mx])
+    # if(genalpha2[ncount] <= U2[2]):
+    #     A2.append(ksi2[0])
+    # elif (genalpha2[ncount] > U2[2] and genalpha2[ncount] <= U2[3]):
+    #     A2.append(ksi2[1])
+    # elif (genalpha2[ncount] > U2[3] and genalpha2[ncount] <= U2[4]):
+    #     A2.append(ksi2[2])
+    # elif (genalpha2[ncount] > U2[4] and genalpha2[ncount] <= U2[5]):
+    #     A2.append(ksi2[3])  
+    # elif (genalpha2[ncount] > U2[5] and genalpha2[ncount] <= U2[6]):
+    #     A2.append(ksi2[4])
 
 
 print(A2)
 
+
 print('Применив критерий Пирсона хи-квадрат проверим, действительно ли эти реализации взяты из заданной величины кси на уровне значимости 0,05')
 y = dict([(ksi2[i], P2[i]) for i in range(len(ksi2))])
-task_2 = X2Discrete(A2, y).get_stat()
+x2 = X2Discrete(A2, y)
+task_2 = x2.get_stat()
 print('Проверка гипотезы H0:', test_h(task_2, alpha, k2 - 1))
-
 print('------------------------------------------------------------------------')
 
 print('Случай3. Биномиальное распределение')
@@ -187,12 +193,30 @@ for _ in range(n3):
 print(A3)
 
 # print('Применив критерий Пирсона хи-квадрат проверим, действительно ли эти реализации взяты из заданной величины кси на уровне значимости 0,05')
-Pearson_2(A3, n3, alpha, n, p)
+
+# function [result] = Pearson_2(A, n, alpha, int, p)
+
+ver = p
+k = n
+# Формируем значения дискретной случайной величины
+N = list(range(k))
+nk = len(N)
+print(nk)
+
+# Теоретические вероятности
+P = [0]
+for i in range(1,nk):
+    P.append((factorial(nk) / ((factorial(nk-i)) * factorial(i))) * (ver**i) * (1-p)**(nk-i))
+P
+y = dict([(N[i], P[i]) for i in range(1,len(N))])
+q = X2Discrete(A3,y).get_stat()
+print('Проверка критерия Пирсона %s' % test_h(q, alpha, n-1))
+# Pearson_2(A3, n3, alpha, n, p)
 
 print('------------------------------------------------------------------------')
 
 print('Задача 2. Моделирование дискретной случайной величины с бесконечным числом значений')
-print('Случай1.Распределение Пуассона')
+print('Случай 1. Распределение Пуассона')
 
 # Количество реализаций
 print('Количество реализаций n:')
@@ -206,16 +230,30 @@ print(_lambda)
 
 
 print('Массив n-реализаций случайной величины кси A:')
-A4 = poissrnd(_lambda, [1, n4])
- 
+A4 = np.random.poisson(_lambda, n4) 
 print(A4)
 
 print('Применив критерий Пирсона хи-квадрат проверим, действительно ли эти реализации взяты из заданной величины кси на уровне значимости 0,05')
-Pearson_3(A4, n4, alpha, _lambda)
+I = list((k for k,_ in groupby(sorted(A4))))
+I
+# Для формулы считаем экспоненту в степени -лямда
+expInAlpha = exp(-_lambda)
+
+k = len(I)
+
+# Теоретические вероятности
+P = []
+for i in range(k):
+    P.append(((_lambda**i) / factorial(i)) * expInAlpha)
+print(P, sum(P), sep='\r\n')
+y = dict([(I[i], P[i]) for i in range(k)])
+x2 = X2Discrete(A4, y).get_stat()
+print('Проверка критерия Пирсона %s' % test_h(x2, alpha, k-1))
+# Pearson_3(A4, n4, alpha, _lambda)
 
 print('------------------------------------------------------------------------')
 
-print('Случай2. Геометрическое распределение')
+print('Случай 2. Геометрическое распределение')
 
 # Количество реализаций
 print('Количество реализаций n:')
@@ -228,10 +266,28 @@ p_geom = 0.37
 print(p_geom)
 
 print('Массив n-реализаций случайной величины кси A:')
-A5 = geornd(p_geom, [1, n5])
+A5 = np.random.geometric(p_geom, n5)
  
 print(A5)
 
 print('Применив критерий Пирсона хи-квадрат проверим, действительно ли эти реализации взяты из заданной величины кси на уровне значимости 0,05')
-Pearson_4(A5, n5, alpha, p_geom)
+# Pearson_4(A5, n5, alpha, p_geom)
 
+# Формируем значения дискретной случайной величины из массива, выбирая
+# уникальные значения
+I = [k for k,_ in groupby(sorted(A5))]
+I
+# Для формулы считаем экспоненту в степени -лямда
+
+k = len(I)
+
+# Теоретические вероятности
+P = []
+for j in range(1,k+1):
+   P.append(p_geom * ((1 - p_geom)**(j-1)))
+print('\r\n'.join((str(i) for i in P)), sep='\r\n')
+print('\r\n',sum(P))
+
+y = dict([(I[i], P[i]) for i in range(k)])
+x2 = X2Discrete(A5, y).get_stat()
+print('Проверка критерия Пирсона %s' % test_h(x2, alpha, k-1))
