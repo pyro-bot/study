@@ -15,7 +15,8 @@ from optimize.evolution import EvolutionOptimize
 from criterion.test_h import test as test_h
 
 
-
+rnd = random.Random()
+rand = rnd.random
 
 # Задаём уровень значимости альфа
 print('Уровень значимости alpha:')
@@ -108,7 +109,7 @@ print(P2)
 
 # Массив псевдослучайных чисел
 print('Массив псевдослучайных чисел альфа:')
-genalpha2 = rand(100,1)
+genalpha2 = np.random.uniform(size=100)
 print(genalpha2)
 
 # количество частей отрезка (01)
@@ -117,37 +118,40 @@ k2 = 5
 print(k2)
 
 # Точки для разбития отрезка (01)
-U2 = [None, 0]
-for kcount in range(2,k2+1):
-    U2[kcount]=P2[kcount-1] + U2[kcount-1]
-end
+U2=[0]
+for kcount in range(k2):
+    U2.append(P2[kcount] + U2[kcount])
+
 print('U2:')
 print(U2)
 
 # Получим n-реализаций случайной величины кси с помощью моделирующей формулы
 # Массив n-реализаций случайной величины кси A
 print('Массив n-реализаций случайной величины кси A:')
+A2 = []
 for ncount in range(1,n1):
-    if(genalpha2(ncount)<=U2[2]):
-        A2[ncount]=-8
-    elif (genalpha2[ncount]>U2[2] and genalpha2[ncount]<=U2[3]):
-        A2[ncount]=-5
-    elif (genalpha2[ncount]>U2[3] and genalpha2[ncount]<=U2[4]):
-        A2[ncount]=0
-    elif (genalpha2[ncount]>U2[4] and genalpha2[ncount]<=U2[5]):
-        A2[ncount]=3  
-    elif (genalpha2[ncount]>U2[5] and genalpha2[ncount]<=U2[6]):
-        A2[ncount]=7 
+    if(genalpha2[ncount] <= U2[2]):
+        A2.append(ksi2[0])
+    elif (genalpha2[ncount] > U2[2] and genalpha2[ncount] <= U2[3]):
+        A2.append(ksi2[1])
+    elif (genalpha2[ncount] > U2[3] and genalpha2[ncount] <= U2[4]):
+        A2.append(ksi2[2])
+    elif (genalpha2[ncount] > U2[4] and genalpha2[ncount] <= U2[5]):
+        A2.append(ksi2[3])  
+    elif (genalpha2[ncount] > U2[5] and genalpha2[ncount] <= U2[6]):
+        A2.append(ksi2[4])
 
 
 print(A2)
 
 print('Применив критерий Пирсона хи-квадрат проверим, действительно ли эти реализации взяты из заданной величины кси на уровне значимости 0,05')
-Pearson_1(A2, n2, alpha, k2, ksi2, P2)
+y = dict([(ksi2[i], P2[i]) for i in range(len(ksi2))])
+task_2 = X2Discrete(A2, y).get_stat()
+print('Проверка гипотезы H0:', test_h(task_2, alpha, k2 - 1))
 
 print('------------------------------------------------------------------------')
 
-print('Случай3.Биномиальное распределение')
+print('Случай3. Биномиальное распределение')
 
 # Количество реализаций
 print('Количество реализаций n:')
@@ -167,17 +171,19 @@ print(p)
 # Смоделируем опыт, состоящий из n = 8 независимых испытаний и подсчитаем число испытаний, 
 # в которых произошло событие А в данной серии. 
 print('Массив n-испытаний случайной величины кси A:')
-for ncount in range(1,n3):
+X = []
+A3 = []
+for _ in range(n3):
     B=0
-    for expcount in range(1,n):
-        genalpha3 = rand(1)
+    for _ in range(n):
+        genalpha3 = rand()
         if genalpha3 < p:
-            X[expcount]=1
-            B = B+1
+            X.append(1)
+            B = B + 1
         else:
-            X[expcount]=0  
+            X.append(0)  
     print(X)
-    A3[ncount]=B
+    A3.append(B)
 print(A3)
 
 # print('Применив критерий Пирсона хи-квадрат проверим, действительно ли эти реализации взяты из заданной величины кси на уровне значимости 0,05')
@@ -209,7 +215,7 @@ Pearson_3(A4, n4, alpha, _lambda)
 
 print('------------------------------------------------------------------------')
 
-print('Случай2.Геометрическое распределение')
+print('Случай2. Геометрическое распределение')
 
 # Количество реализаций
 print('Количество реализаций n:')
