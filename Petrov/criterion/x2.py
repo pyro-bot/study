@@ -15,6 +15,7 @@ class X2Discrete (pirson.Pirson):
         l = self.l
         p = self.y
        
+        print('Частоты появления величин:\r\n%s' % n)
         X = sum(((n[i] - l*pi)**2) / (l * pi) for i, pi in p.items())
         
         return X
